@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsão de Adaptabilidade</title>
+    <link rel="stylesheet" href="stylesProjeto.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Previsão de Adaptabilidade</h2>
+        <form id="prediction-form">
+            <label for="age">Idade:</label>
+            <input type="number" id="age" required>
+
+            <label for="study-time">Horas de Estudo:</label>
+            <input type="number" id="study-time" required>
+
+            <label for="internet">Acesso à Internet:</label>
+            <select id="internet">
+                <option value="1">Sim</option>
+                <option value="0">Não</option>
+            </select>
+
+            <button type="submit">Prever</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="scriptProjeto.js"></script>
+</body>
+</html>
