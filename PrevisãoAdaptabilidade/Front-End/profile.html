@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perfil</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">MyAdapt</a>
+      <button id="btn-logout" class="btn btn-outline-secondary">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <h2>Perfil</h2>
+    <div id="perfil" class="mt-4"></div>
+    <hr>
+    <h4>Alterar Password</h4>
+    <form id="pwForm" class="row g-3 mt-2">
+      <div class="col-md-6">
+        <input type="password" id="oldPw" class="form-control" placeholder="Password atual" required>
+      </div>
+      <div class="col-md-6">
+        <input type="password" id="newPw" class="form-control" placeholder="Nova password" required minlength="6">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary">Atualizar</button>
+      </div>
+    </form>
+    <div id="pwMsg" class="mt-3"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    if (!localStorage.getItem('access_token')) location='login.html';
+    document.getElementById('btn-logout').onclick = ()=> {
+      localStorage.removeItem('access_token'); location='login.html';
+    };
+    // Preenche email
+    document.getElementById('perfil').innerHTML =
+      `<p><strong>Email:</strong> ${jwt = JSON.parse(atob(localStorage.getItem('access_token').split('.')[1])).email}</p>`;
+
+    // Atualizar password (podes apontar a um endpoint /change-password se criares)
+    document.getElementById('pwForm').onsubmit = async e=>{
+      e.preventDefault();
+      document.getElementById('pwMsg').innerHTML = '';
+      // ... chamada ao teu endpoint de troca de password ...
+      document.getElementById('pwMsg').innerHTML =
+        `<div class="alert alert-info">Funcionalidade ainda não implementada.</div>`;
+    }
+  </script>
+</body>
+</html>

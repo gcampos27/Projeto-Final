@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Histórico de Previsões</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">MyAdapt</a>
+      <button id="btn-logout" class="btn btn-outline-secondary">Logout</button>
+    </div>
+  </nav>
+
+  <body class="bg-light">
+    <div class="container py-5">
+      <h1 class="mb-4 text-center">📋 Histórico de Previsões</h1>
+      <div id="alerta" class="mb-3"></div>
+      <div class="table-responsive">
+        <table id="historyTable" class="table table-striped table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <!-- Ajusta colunas conforme o teu CSV -->
+              <th>Gender</th><th>Age</th><th>Education.Level</th>
+              <th>Institution.Type</th><th>IT.Student</th><th>Location</th>
+              <th>Load_shedding</th><th>Financial.Condition</th>
+              <th>Internet.Type</th><th>Network.Type</th>
+              <th>Class.Duration</th><th>Self.Lms</th><th>Device</th>
+              <th>Prediction</th><th>Time</th><th>Explicação</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  <script>
+    function loadHistory() {
+      const historico = JSON.parse(localStorage.getItem("historicoPrevisoes") || "[]");
+      const tbody = document.querySelector("#historyTable tbody");
+      tbody.innerHTML = "";
+
+      if (historico.length === 0) {
+        document.getElementById("alerta").innerHTML =
+          `<div class="alert alert-info">Ainda não há previsões.</div>`;
+        return;
+      } else {
+        document.getElementById("alerta").innerHTML = "";
+      }
+
+      historico.forEach(row => {
+        let expl = "";
+        if (row.Prediction == "1") {
+          expl = "Adaptabilidade baixa – talvez necessite de mais apoio.";
+        } else {
+          expl = "Adaptabilidade moderada/alta – está a correr bem!";
+        }
+
+        const tr = document.createElement("tr");
+        [
+          "Gender", "Age", "Education.Level", "Institution.Type", "IT.Student",
+          "Location", "Load_shedding", "Financial.Condition", "Internet.Type",
+          "Network.Type", "Class.Duration", "Self.Lms", "Device",
+          "Prediction", "Time"
+        ].forEach(col => {
+          const td = document.createElement("td");
+          td.textContent = row[col];
+          tr.appendChild(td);
+        });
+
+        const tdExpl = document.createElement("td");
+        tdExpl.textContent = expl;
+        tr.appendChild(tdExpl);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Carrega o histórico quando a página terminar de carregar
+    document.addEventListener('DOMContentLoaded', loadHistory);
+  </script>
+</body>
+</html>
