@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Previsão de Adaptabilidade</title>
+
+  <!-- Bootstrap 5 + Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+:root {
+  --bs-primary:   #2c3e50;
+  --bs-secondary: #7f8c8d;
+  --bs-light:     #ecf0f1;
+  --bs-accent:    #3498db;
+}
+
+body {
+  background: var(--bs-light);
+  font-family: "Segoe UI", sans-serif;
+}
+
+.card-form {
+  max-width: 760px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  animation: fadeInCard 0.4s ease-out;
+}
+
+@keyframes fadeInCard {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--bs-primary);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.4rem;
+}
+
+.section-title i {
+  margin-left: 0.5rem;
+  color: var(--bs-secondary);
+  cursor: help;
+  font-size: 1rem;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-select-lg,
+.form-control-lg {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid #ced4da;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-select-lg:focus,
+.form-control-lg:focus {
+  border-color: var(--bs-accent);
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-prever {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.25rem;
+  border-radius: 0.6rem;
+  background: var(--bs-primary);
+  border: none;
+  transition: background 0.3s ease;
+}
+
+.btn-prever:hover {
+  background: #1a252f;
+}
+
+#resultado .card {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(1rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.spaced-bottom {
+  margin-bottom: 2rem;
+}
+</style>
+</head>
+<body>
+  <nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand" href="index.html">MyAdapt</a>
+      <div>
+        <a href="history.html" class="btn btn-outline-primary me-2">📋 Ver Histórico</a>
+        <button id="btn-logout" class="btn btn-outline-secondary">Logout</button>
+      </div>
+    </div>
+  </nav>
+  <div class="card-form">
+    <h2 class="text-center mb-4">📊 Previsão de Adaptabilidade</h2>
+    <form id="predictForm">
+      <!-- Dados Pessoais -->
+      <div class="section-title">
+        Dados Pessoais
+        <i class="fa fa-info-circle" data-bs-toggle="tooltip"
+           title="Dados de género e idade para perfil demográfico"></i>
+      </div>
+      <div class="col spaced-bottom">
+        <label for="studentId" class="form-label">Identificador do Aluno</label>
+        <input type="text" id="studentId" class="form-control form-control-lg" placeholder="Ex: a123" />
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <label for="Gender" class="form-label">Género</label>
+          <select id="Gender" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="Boy">Masculino</option>
+            <option value="Girl">Feminino</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Age" class="form-label">Idade</label>
+          <select id="Age" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="3">1–5 anos</option>
+            <option value="8">6–10 anos</option>
+            <option value="13">11–15 anos</option>
+            <option value="18">16–20 anos</option>
+            <option value="23">21–25 anos</option>
+            <option value="28">≥26 anos</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Education_Level" class="form-label">Nível de Ensino</label>
+          <select id="Education_Level" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="1">Básico</option>
+            <option value="2">Secundário</option>
+            <option value="3">Superior</option>
+          </select>
+        </div>
+      </div>
+      <!-- Condições Académicas -->
+      <div class="section-title">
+        Condições Académicas
+        <i class="fa fa-info-circle" data-bs-toggle="tooltip"
+           title="Tipo de instituição e formação"></i>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <label for="Institution_Type" class="form-label">Instituição</label>
+          <select id="Institution_Type" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">Pública</option>
+            <option value="1">Privada</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="IT_Student" class="form-label">Estudante de Informática?</label>
+          <select id="IT_Student" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">Não</option>
+            <option value="1">Sim</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Location" class="form-label">Morada</label>
+          <select id="Location" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">Rural</option>
+            <option value="1">Urbana</option>
+          </select>
+        </div>
+      </div>
+      <!-- Infraestrutura & Conectividade -->
+      <div class="section-title">
+        Infraestrutura & Conectividade
+        <i class="fa fa-info-circle" data-bs-toggle="tooltip"
+           title="Energia, internet e dispositivos"></i>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <label for="Load_shedding" class="form-label">Cortes de Eletricidade</label>
+          <select id="Load_shedding" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">Baixa tendência</option>
+            <option value="1">Alta tendência</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Self_Lms" class="form-label">Usa LMS Próprio?</label>
+          <select id="Self_Lms" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">Não</option>
+            <option value="1">Sim</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Financial_Condition" class="form-label">Condição Financeira</label>
+          <select id="Financial_Condition" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="1">Baixa</option>
+            <option value="2">Média</option>
+            <option value="3">Alta</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Internet_Type" class="form-label">Tipo de Internet</label>
+          <select id="Internet_Type" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">Wi-Fi</option>
+            <option value="1">Dados móveis</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Network_Type" class="form-label">Rede</label>
+          <select id="Network_Type" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">2G</option>
+            <option value="1">3G</option>
+            <option value="2">4G</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Class_Duration" class="form-label">Duração (h/dia)</label>
+          <select id="Class_Duration" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="0">0h</option>
+            <option value="1">1h</option>
+            <option value="2">2-3h</option>
+            <option value="4">≥4h</option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="Device" class="form-label">Dispositivo</label>
+          <select id="Device" class="form-select form-select-lg">
+            <option value="" disabled selected>Selecione…</option>
+            <option value="1">Telemóvel</option>
+            <option value="2">Tablet</option>
+            <option value="3">Computador</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Botão Prever -->
+      <div class="d-grid mt-5">
+        <button type="button" id="btn" class="btn btn-primary btn-lg btn-prever">
+          <span id="btn-text">Prever</span>
+          <span id="btn-spinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Resultado -->
+    <div id="resultado" class="mt-4"></div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    // Tooltips
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
+    // Função de predição via fetch
+    async function onPreverClick() {
+      const btn        = document.getElementById("btn");
+      const btnText    = document.getElementById("btn-text");
+      const btnSpinner = document.getElementById("btn-spinner");
+      const resultado  = document.getElementById("resultado");
+
+      const identificador = document.getElementById("studentId").value.trim();
+        if (!identificador) {
+          alert("Por favor, insira o identificador do aluno.");
+          return;
+        }
+        
+      const vals = {
+        ID: identificador,
+        Gender:              document.getElementById("Gender").value,
+        Age:                 +document.getElementById("Age").value,
+        "Education.Level":     document.getElementById("Education_Level").value,
+        "Institution.Type":    document.getElementById("Institution_Type").value,
+        "IT.Student":          document.getElementById("IT_Student").value,
+        Location:            document.getElementById("Location").value,
+        Load_shedding:       document.getElementById("Load_shedding").value,
+        "Self.Lms":            document.getElementById("Self_Lms").value,
+        "Financial.Condition": document.getElementById("Financial_Condition").value,
+        "Internet.Type":       document.getElementById("Internet_Type").value,
+        "Network.Type":        document.getElementById("Network_Type").value,
+        "Class.Duration":      document.getElementById("Class_Duration").value,
+        Device:              document.getElementById("Device").value
+      };
+
+      // Verificar se todos os campos estão preenchidos
+      for (const [key, value] of Object.entries(vals)) {
+        if (value === "" || value === undefined || value === null || Number.isNaN(value)) {
+          alert("Por favor preencha todos os campos antes de submeter.");
+          btn.disabled = false;
+          btnText.textContent = "Prever";
+          btnSpinner.classList.add("d-none");
+          return;
+        }
+      }
+
+      // Feedback visual
+      btn.disabled = true;
+      btnText.textContent = "A processar…";
+      btnSpinner.classList.remove("d-none");
+      resultado.innerHTML = "";
+
+      try {
+        const response = await fetch("http://localhost:8000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(vals)
+        });
+
+        if (!response.ok) throw new Error("Falha na resposta do servidor");
+
+        const data = await response.json();
+        console.log("Resposta do backend:", data);  // <- AQUI! Para veres o JSON completo recebido
+        const pred = data.predito;
+        console.log("Valor predito:", pred);       // <- Para veres o valor exato de predito
+
+        const nivel = pred.toString().trim() === "1" ? "Baixo" : "Moderado-Alto";
+
+        const explicacao = nivel === "Baixo"
+          ? "O modelo prevê um baixo nível de adaptabilidade ao ensino remoto."
+          : "O modelo prevê um nível de adaptabilidade moderado a alto ao ensino remoto.";
+
+        resultado.innerHTML = `
+        <div class="card border-${nivel === "Baixo" ? "danger" : "success"}">
+          <div class="card-header bg-${nivel === "Baixo" ? "danger" : "success"} text-white">Resultado da Previsão</div>
+          <div class="card-body">
+            <p class="card-text"><strong>Nível de adaptabilidade previsto:</strong></p>
+            <h3 class="card-title">${nivel}</h3>
+            <p class="mt-3">${explicacao}</p>
+          </div>
+        </div>`;
+
+        // Guardar no histórico local
+        const historico = JSON.parse(localStorage.getItem("historicoPrevisoes") || "[]");
+        historico.push({
+          ID: vals.ID,
+          Gender: vals.Gender,
+          Age: vals.Age,
+          "Education.Level": vals["Education.Level"],
+          "Institution.Type": vals["Institution.Type"],
+          "IT.Student": vals["IT.Student"],
+          Location: vals.Location,
+          Load_shedding: vals.Load_shedding,
+          "Financial.Condition": vals["Financial.Condition"],
+          "Internet.Type": vals["Internet.Type"],
+          "Network.Type": vals["Network.Type"],
+          "Class.Duration": vals["Class.Duration"],
+          "Self.Lms": vals["Self.Lms"],
+          Device: vals.Device,
+          Prediction: pred,
+          Time: new Date().toLocaleString()
+        });
+        localStorage.setItem("historicoPrevisoes", JSON.stringify(historico));
+
+    } catch (e) {
+      resultado.innerHTML = `<div class="alert alert-danger">Erro: ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btnText.textContent = "Prever";
+      btnSpinner.classList.add("d-none");
+    }
+  }
+    document.getElementById("btn").addEventListener("click", onPreverClick);
+    document.getElementById("btn-logout").addEventListener("click", function () {
+      if (confirm("Tens a certeza que desejas terminar a sessão?")) {
+        localStorage.clear(); // ou remove apenas o necessário
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+</body>
+</html>

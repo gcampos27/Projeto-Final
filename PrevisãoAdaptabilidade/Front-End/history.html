@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Histórico de Previsões</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<style>
+  #searchInput:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+  body {
+    background-color: #f8f9fa;
+  }
+  .card h2 {
+    font-size: 1.8rem;
+    color: #343a40;
+  }
+  #searchInput {
+    border: 1px solid #ced4da;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  }
+</style>
+
+<body>
+  <nav class="navbar navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">MyAdapt</a>
+      <button id="btn-logout" class="btn btn-outline-secondary">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+  <!-- Agrupamento de título e pesquisa -->
+  <div class="card shadow-sm mb-4 p-4">
+    <h2 class="mb-3 text-center">📋 Histórico de Previsões</h2>
+    <input
+      type="text"
+      id="searchInput"
+      class="form-control"
+      placeholder="🔍 Procurar por ID, género, dispositivo..."
+    />
+  </div>
+
+  <!-- Alerta -->
+  <div id="alerta" class="mb-3"></div>
+
+  <!-- Tabela em card -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="historyTable" class="table table-striped table-hover m-0">
+          <thead class="table-dark text-center">
+            <tr>
+              <th>ID_Aluno</th><th>Género</th><th>Estimativa da Idade</th><th>Nível de Educação</th>
+              <th>Tipo de Instituição</th><th>Estudante de Engenharia Informátia</th><th>Tipo de Morada</th>
+              <th>Cortes de Eletricidade</th><th>Condição Financeira</th>
+              <th>Tipo de Internet</th><th>Tipo de Network</th>
+              <th>Duração das aulas</th><th>Self.Lms</th><th>Dispositivo</th>
+              <th>Previsão</th><th>Hora da Previsão</th><th>Explicação</th>
+            </tr>
+          </thead>
+          <tbody class="text-center"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão de exportar -->
+  <div class="d-flex justify-content-end mt-3">
+    <button id="btn-export" class="btn btn-success shadow-sm">
+      ⬇️ Exportar para Excel
+    </button>
+  </div>
+</div>
+  <script>
+  const traducoes = {
+    Gender: { "Boy": "Masculino", "Girl": "Feminino" },
+    Age: {
+      "3": "1–5 anos", "8": "6–10 anos", "13": "11–15 anos",
+      "18": "16–20 anos", "23": "21–25 anos", "28": "≥26 anos"
+    },
+    "Education.Level": { "1": "Básico", "2": "Secundário", "3": "Superior" },
+    "Institution.Type": { "0": "Pública", "1": "Privada" },
+    "IT.Student": { "0": "Não", "1": "Sim" },
+    Location: { "0": "Rural", "1": "Urbana" },
+    Load_shedding: { "0": "Baixa tendência", "1": "Alta tendência" },
+    "Financial.Condition": { "1": "Baixa", "2": "Média", "3": "Alta" },
+    "Internet.Type": { "0": "Wi-Fi", "1": "Dados móveis" },
+    "Network.Type": { "0": "2G", "1": "3G", "2": "4G" },
+    "Class.Duration": { "0": "0h", "1": "1h", "2": "2-3h", "4": "≥4h" },
+    "Self.Lms": { "0": "Não", "1": "Sim" },
+    Device: { "1": "Telemóvel", "2": "Tablet", "3": "Computador" }
+  };
+
+  function loadHistory() {
+    const historico = JSON.parse(localStorage.getItem("historicoPrevisoes") || "[]");
+    const tbody = document.querySelector("#historyTable tbody");
+    tbody.innerHTML = "";
+
+    if (historico.length === 0) {
+      document.getElementById("alerta").innerHTML =
+        `<div class="alert alert-info">Ainda não há previsões.</div>`;
+      return;
+    } else {
+      document.getElementById("alerta").innerHTML = "";
+    }
+
+    historico.forEach(row => {
+      let expl = row.Prediction == "1"
+        ? "Adaptabilidade baixa – necessita de mais apoio."
+        : "Adaptabilidade moderada/alta – Preparado para a transição!";
+
+      const tr = document.createElement("tr");
+      const tdId = document.createElement("td");
+        tdId.textContent = row.ID ?? "(sem ID)";  
+        tr.appendChild(tdId);
+      [
+        "Gender", "Age", "Education.Level", "Institution.Type", "IT.Student",
+        "Location", "Load_shedding", "Financial.Condition", "Internet.Type",
+        "Network.Type", "Class.Duration", "Self.Lms", "Device",
+        "Prediction", "Time"
+      ].forEach(col => {
+        const td = document.createElement("td");
+        const val = row[col];
+
+        if (col === "Prediction") {
+          td.textContent = val == "1" ? "Adapt. baixa" : "Adapt. moderada/alta";
+        } else if (traducoes[col]) {
+          td.textContent = traducoes[col][val] ?? val;
+        } else {
+          td.textContent = val;
+        }
+
+        tr.appendChild(td);
+      });
+
+      const tdExpl = document.createElement("td");
+      tdExpl.textContent = expl;
+      tr.appendChild(tdExpl);
+
+      tbody.appendChild(tr);
+    });
+  }
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#historyTable tbody tr");
+
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? "" : "none";
+    });
+  });
+  document.addEventListener('DOMContentLoaded', loadHistory);
+  document.getElementById("btn-export").addEventListener("click", function () {
+  const historico = JSON.parse(localStorage.getItem("historicoPrevisoes") || "[]");
+
+  if (historico.length === 0) {
+    alert("Não há dados para exportar.");
+    return;
+  }
+
+  // Mapeia os dados para uma estrutura mais legível
+  const dadosFormatados = historico.map(row => ({
+    "ID do Aluno": row.ID ?? "(sem ID)",
+    "Género": traducoes.Gender[row.Gender] ?? row.Gender,
+    "Idade": traducoes.Age[row.Age] ?? row.Age,
+    "Nível de Educação": traducoes["Education.Level"][row["Education.Level"]] ?? row["Education.Level"],
+    "Tipo de Instituição": traducoes["Institution.Type"][row["Institution.Type"]] ?? row["Institution.Type"],
+    "Estudante de Engenharia Informática": traducoes["IT.Student"][row["IT.Student"]] ?? row["IT.Student"],
+    "Tipo de Morada": traducoes.Location[row.Location] ?? row.Location,
+    "Cortes de Eletricidade": traducoes.Load_shedding[row.Load_shedding] ?? row.Load_shedding,
+    "Condição Financeira": traducoes["Financial.Condition"][row["Financial.Condition"]] ?? row["Financial.Condition"],
+    "Tipo de Internet": traducoes["Internet.Type"][row["Internet.Type"]] ?? row["Internet.Type"],
+    "Tipo de Network": traducoes["Network.Type"][row["Network.Type"]] ?? row["Network.Type"],
+    "Duração das Aulas": traducoes["Class.Duration"][row["Class.Duration"]] ?? row["Class.Duration"],
+    "Self.Lms": traducoes["Self.Lms"][row["Self.Lms"]] ?? row["Self.Lms"],
+    "Dispositivo": traducoes.Device[row.Device] ?? row.Device,
+    "Previsão": row.Prediction == "1" ? "Adapt. baixa" : "Adapt. moderada/alta",
+    "Hora da Previsão": row.Time ?? "",
+    "Explicação": row.Prediction == "1"
+      ? "Adaptabilidade baixa – necessita de mais apoio."
+      : "Adaptabilidade moderada/alta – Preparado para a transição!"
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(dadosFormatados);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Previsões");
+
+  XLSX.writeFile(workbook, "Historico_Previsoes.xlsx");
+});
+
+document.getElementById("btn-logout").addEventListener("click", function () {
+  if (confirm("Tens a certeza que desejas terminar a sessão?")) {
+    localStorage.clear(); // ou remove apenas o necessário
+    window.location.href = "login.html";
+  }
+});
+
+</script>
+</body>
+</html>
